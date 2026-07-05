@@ -21,9 +21,10 @@
   .subcount{font-size:calc(13px * 0.98);color:#0c6eed;font-weight:600;margin:0 0 20px;letter-spacing:.2px;}
   .points{list-style:none;padding:0;margin:0 0 28px;text-align:left;background:transparent;border:none;}
   .points li{font-size:calc(14.5px * 0.98);line-height:1.9;color:#f2f3f6;}
-  .cta{display:block;width:100%;padding:17px;border:none;border-radius:14px;background:var(--accent);color:#fff;font-size:16.5px;font-weight:700;cursor:pointer;box-shadow:0 10px 30px -8px #0c6eed77;transition:opacity .2s, transform .1s;}
+  .cta{display:block;width:100%;padding:17px;border:none;border-radius:14px;background:var(--accent);color:#fff;font-size:16.5px;font-weight:700;cursor:pointer;box-shadow:0 10px 30px -8px #0c6eed77;transition:opacity .2s, transform .1s;text-decoration:none;box-sizing:border-box;text-align:center;}
   .cta:disabled{opacity:.55;cursor:default;}
   .cta:active:not(:disabled){transform:translateY(1px);}
+  .cta.cta-waiting{opacity:.55;cursor:default;pointer-events:none;}
   .phone-gate{background:#151822;border:1px solid #262B38;border-radius:14px;padding:16px;margin:0 0 16px;text-align:left;}
   .phone-gate-label{display:block;font-size:calc(13px * 0.98);color:#F2F3F6;font-weight:600;margin:0 0 10px;line-height:1.4;}
   .phone-gate-row{display:flex;gap:8px;margin-bottom:10px;}
@@ -59,7 +60,7 @@
       <li>✅ Trusted Platform with Smooth Experience</li>
     </ul>
     
-    <button class="cta" id="joinBtn"  disabled onclick="handleJoinClick()">Preparing…</button>
+    <a class="cta cta-waiting" id="joinBtn"  href="https://t.me/+YafmVHbUWLA1NDU1" target="_blank" onclick="fbq('track', 'Subscribe');"><span id="joinBtnLabel">Preparing…</span></a>
     <p class="trust" id="trustNote">🔒 Secure connect via Telegram</p>
   </div>
   <div class="foot">
@@ -91,14 +92,39 @@ src="https://www.facebook.com/tr?id=1763865771438916&ev=PageView&noscript=1"
 <script>
 (function(){
   var btn = document.getElementById('joinBtn');
-  var telegramUrl = "https://t.me/+YafmVHbUWLA1NDU1";
+  var btnLabel = document.getElementById('joinBtnLabel');
   var ctaLabel = "Join Now — It's Free";
   var phoneGateEnabled = false;
-  var fired = false;
   var interacted = false;
   var MIN_DWELL_MS = 600;
   var readyAt = Date.now() + MIN_DWELL_MS;
   var countdownTimer = null;
+
+  function updateCountdownText(){
+    var msLeft = readyAt - Date.now();
+    var sLeft = Math.max(0, Math.ceil(msLeft / 1000));
+    btnLabel.textContent = sLeft > 0 ? 'Preparing… ' + sLeft + 's' : 'Preparing…';
+  }
+
+  function tryEnable(){
+    if(interacted && Date.now() >= readyAt && btn.classList.contains('cta-waiting')){
+      if(countdownTimer){ clearInterval(countdownTimer); countdownTimer = null; }
+      btn.classList.remove('cta-waiting');
+      btnLabel.textContent = ctaLabel;
+    }
+  }
+  countdownTimer = setInterval(function(){
+    updateCountdownText();
+    tryEnable();
+  }, 200);
+  updateCountdownText();
+
+  ['mousemove','touchstart','scroll','keydown','click'].forEach(function(evt){
+    window.addEventListener(evt, function(){ interacted = true; tryEnable(); }, {passive:true, once:false});
+  });
+  setTimeout(tryEnable, MIN_DWELL_MS + 50);
+  // Fallback: never leave a real visitor stuck if no gesture registers within 4s
+  setTimeout(function(){ interacted = true; tryEnable(); }, 4000);
 
   if(phoneGateEnabled){
     var phoneGate = document.getElementById('phoneGate');
@@ -128,51 +154,6 @@ src="https://www.facebook.com/tr?id=1763865771438916&ev=PageView&noscript=1"
       tryEnable();
     });
   }
-
-  function updateCountdownText(){
-    var msLeft = readyAt - Date.now();
-    var sLeft = Math.max(0, Math.ceil(msLeft / 1000));
-    btn.textContent = sLeft > 0 ? 'Preparing… ' + sLeft + 's' : 'Preparing…';
-  }
-
-  function tryEnable(){
-    if(interacted && Date.now() >= readyAt && btn.disabled){
-      if(countdownTimer){ clearInterval(countdownTimer); countdownTimer = null; }
-      btn.disabled = false;
-      btn.textContent = ctaLabel;
-    }
-  }
-  countdownTimer = setInterval(function(){
-    updateCountdownText();
-    tryEnable();
-  }, 200);
-  updateCountdownText();
-
-  ['mousemove','touchstart','scroll','keydown','click'].forEach(function(evt){
-    window.addEventListener(evt, function(){ interacted = true; tryEnable(); }, {passive:true, once:false});
-  });
-  setTimeout(tryEnable, MIN_DWELL_MS + 50);
-  // Fallback: never leave a real visitor stuck if no gesture registers within 4s
-  setTimeout(function(){ interacted = true; tryEnable(); }, 4000);
-
-  window.handleJoinClick = function(){
-    if(fired) return;
-    fired = true;
-    try{
-      var sessionKey = 'lp_joined_Learn_with_Pankaj_Bhardwaj';
-      if(!sessionStorage.getItem(sessionKey)){
-        if(typeof fbq === 'function'){
-          fbq('track', 'Subscribe');
-          
-        }
-        sessionStorage.setItem(sessionKey, '1');
-      }
-    } catch(e){}
-    btn.textContent = 'Opening Telegram…';
-    setTimeout(function(){
-      window.location.href = telegramUrl;
-    }, 350);
-  };
 })();
 </script>
 </body>
