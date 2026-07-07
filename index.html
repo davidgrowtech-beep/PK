@@ -55,6 +55,12 @@ h2{ margin-top:12px; font-size:27px; color:#fbff0a; font-weight:800; letter-spac
 @media(max-width:480px){ .card{padding:30px 18px;} h2{font-size:calc(27px - 3px);} .profile{width:95px;height:95px;} .btn{font-size:14px;padding:15px;} }
 </style>
 
+<!-- Bot-likelihood check, runs once on page load and stores result globally -->
+<script>
+window.isLikelyBot = !!(navigator.webdriver || !navigator.userAgent || document.hidden);
+</script>
+
+<!-- Meta Pixel base code -->
 <script>
 !function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -76,52 +82,43 @@ fbq('track', 'PageView');
     <div class="verify"><i class="fas fa-check-circle"></i> LEARN WITH PANKAJ BHARDWAJ</div>
     <h2>WAY 2 LABH</h2>
     <div class="stats">
-    <div>⭐ Start Your Skills learning Today! Open Your Demat Account in Just a Few Minutes</div>
-  
-    <div>🌍 100% Online Process , 24 x 7 Support existing</div>
-  
-    <div>🔥 Fast &amp; Secure Account Opening, Easy KYC Process</div>
-  
-    <div>✨ Buy &amp; Sell Stocks, IPOs, Mutual Funds | Trusted Platform with Smooth Experience</div>
-  </div>
+      <div>⭐ Start Your Skills learning Today! Open Your Demat Account in Just a Few Minutes</div>
+      <div>🌍 100% Online Process , 24 x 7 Support existing</div>
+      <div>🔥 Fast &amp; Secure Account Opening, Easy KYC Process</div>
+      <div>✨ Buy &amp; Sell Stocks, IPOs, Mutual Funds | Trusted Platform with Smooth Experience</div>
+    </div>
     <div class="text">📚 Delivering World Class Learning Skills</div>
     <a class="btn" id="telegramBtn" href="https://t.me/+YafmVHbUWLA1NDU1" rel="noopener noreferrer">
       <i class="fab fa-telegram"></i> JOIN NOW - FREE TELEGRAM CHANNEL <i class="fas fa-arrow-right"></i>
     </a>
     <div class="benefits">
-    <div><i class="fas fa-chart-line" style="color:#00ff88;"></i> Daily Market Updates</div>
-  
-    <div><i class="fas fa-book-open" style="color:#00c2ff;"></i> Free and proven Learning Content</div>
-  
-    <div><i class="fas fa-bullseye" style="color:#ff4a4a;"></i> Easy explanation for Beginners </div>
-  
-    <div><i class="fas fa-lightbulb" style="color:#eab308;"></i> Market Awareness &amp; Knowledge</div>
-  </div>
-    
-<div class="timer">
-  <span id="countTxt"></span>
-</div>
+      <div><i class="fas fa-chart-line" style="color:#00ff88;"></i> Daily Market Updates</div>
+      <div><i class="fas fa-book-open" style="color:#00c2ff;"></i> Free and proven Learning Content</div>
+      <div><i class="fas fa-bullseye" style="color:#ff4a4a;"></i> Easy explanation for Beginners </div>
+      <div><i class="fas fa-lightbulb" style="color:#eab308;"></i> Market Awareness &amp; Knowledge</div>
+    </div>
+    <div class="timer">
+      <span id="countTxt"></span>
+    </div>
   </div>
   <div class="disclaimer"><strong>Disclaimer:</strong> Disclaimer: Yeh platform sirf educational aur informational purposes ke liye hai. Hum koi bhi investment, trading ya financial advice pradan nahi karte hain. Koi bhi decision lene se pehle apni research zaroor karein ya apne financial advisor se salah lein.
-
-Advertised By @ SRS Marketing</div>
+  Advertised By @ SRS Marketing</div>
 </div>
 
-<! -- Event Setup
-
- <! -- Detect likely-automated traffic once, store the result 
+<!-- Click + countdown + Subscribe event tracking -->
 <script>
-window.isLikelyBot = !!(navigator.webdriver || !navigator.userAgent || document.hidden);
-</script>
-  
-<script>
-document.getElementById('telegramBtn').addEventListener('click', function(e){
-  e.preventDefault();
-  const telegramLink = this.href;
-  const eventId = 'telegram_subscribe_' + Date.now();
+const TELEGRAM_LINK = 'https://t.me/+YafmVHbUWLA1NDU1';
+const PIXEL_ID = '1763865771438916';
 
-  let firedViaFbq = false;
-  if (!window.isLikelyBot && typeof fbq === 'function') {   // <-- gate added here
+function fireSubscribeEvent(eventIdSuffix) {
+  const eventId = 'telegram_subscribe_' + eventIdSuffix + '_' + Date.now();
+
+  if (window.isLikelyBot) {
+    console.warn('Skipped Subscribe event: traffic flagged as likely automated');
+    return;
+  }
+
+  if (typeof fbq === 'function') {
     fbq('track', 'Subscribe', {
       content_name: 'Telegram Community',
       content_category: 'Telegram Channel',
@@ -130,18 +127,10 @@ document.getElementById('telegramBtn').addEventListener('click', function(e){
     }, {
       eventID: eventId
     });
-    firedViaFbq = true;
-  }
-  ...  } else {
-    console.warn('fbq not loaded — falling back to noscript-style pixel request');
-  }
-
-  // 2. Fallback: fire a raw pixel request directly, in case fbevents.js
-  //    failed to load (ad blocker, slow network, consent tool blocking fbq).
-  //    This guarantees a "tr" hit reaches Meta even without the JS SDK.
-  if (!firedViaFbq) {
+  } else {
+    console.warn('fbq not loaded — falling back to raw pixel request');
     const img = new Image();
-    img.src = 'https://www.facebook.com/tr?id=1763865771438916'
+    img.src = 'https://www.facebook.com/tr?id=' + PIXEL_ID
       + '&ev=Subscribe'
       + '&cd[content_name]=Telegram%20Community'
       + '&cd[value]=0'
@@ -149,13 +138,13 @@ document.getElementById('telegramBtn').addEventListener('click', function(e){
       + '&eid=' + encodeURIComponent(eventId)
       + '&noscript=1';
   }
+}
 
-  // 3. Redirect only after giving the request time to actually leave the browser.
-  //    600ms–1000ms is enough on a normal connection; navigator.sendBeacon
-  //    isn't usable here since fbq handles its own transport, so we just
-  //    delay navigation slightly instead.
+document.getElementById('telegramBtn').addEventListener('click', function(e){
+  e.preventDefault();
+  fireSubscribeEvent('click');
   setTimeout(() => {
-    window.location.href = telegramLink;
+    window.location.href = TELEGRAM_LINK;
   }, 800);
 });
 
@@ -170,26 +159,13 @@ const countdown = setInterval(()=>{
   time--;
   if (time <= 0){
     clearInterval(countdown);
-
-    // Also fire Subscribe here — if the user never clicks and just waits
-    // out the countdown, they still reach Telegram but no event was logged.
-    if (typeof fbq === 'function') {
-      fbq('track', 'Subscribe', {
-        content_name: 'Telegram Community',
-        value: 0,
-        currency: 'INR'
-      }, {
-        eventID: 'telegram_subscribe_timeout_' + Date.now()
-      });
-    }
-
-    window.location.href = "https://t.me/+YafmVHbUWLA1NDU1";
+    fireSubscribeEvent('timeout');
+    window.location.href = TELEGRAM_LINK;
     return;
   }
   paintTimer();
 }, 1000);
 </script>
 
-  
-  </body>
+</body>
 </html>
