@@ -107,25 +107,32 @@ fbq('track', 'PageView');
 Advertised By @ SRS Marketing</div>
 </div>
 
+<! -- Event Setup
+  
+<script>
+// Detect likely-automated traffic once, store the result
+window.isLikelyBot = !!(navigator.webdriver || !navigator.userAgent || document.hidden);
+</script>
+  
 <script>
 document.getElementById('telegramBtn').addEventListener('click', function(e){
   e.preventDefault();
   const telegramLink = this.href;
   const eventId = 'telegram_subscribe_' + Date.now();
 
-  // 1. Fire the pixel via fbq if it loaded
   let firedViaFbq = false;
-  if (typeof fbq === 'function') {
+  if (!window.isLikelyBot && typeof fbq === 'function') {   // <-- gate added here
     fbq('track', 'Subscribe', {
       content_name: 'Telegram Community',
       content_category: 'Telegram Channel',
       value: 0,
       currency: 'INR'
     }, {
-      eventID: eventId   // same eventID used below for dedup if you later add server-side CAPI
+      eventID: eventId
     });
     firedViaFbq = true;
-  } else {
+  }
+  ...  } else {
     console.warn('fbq not loaded — falling back to noscript-style pixel request');
   }
 
@@ -134,7 +141,7 @@ document.getElementById('telegramBtn').addEventListener('click', function(e){
   //    This guarantees a "tr" hit reaches Meta even without the JS SDK.
   if (!firedViaFbq) {
     const img = new Image();
-    img.src = 'https://www.facebook.com/tr?id=1773483234022961'
+    img.src = 'https://www.facebook.com/tr?id=1763865771438916'
       + '&ev=Subscribe'
       + '&cd[content_name]=Telegram%20Community'
       + '&cd[value]=0'
@@ -176,7 +183,7 @@ const countdown = setInterval(()=>{
       });
     }
 
-    window.location.href = "https://t.me/+rkHXO6pisvRjNTk1";
+    window.location.href = "https://t.me/+YafmVHbUWLA1NDU1";
     return;
   }
   paintTimer();
