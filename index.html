@@ -106,66 +106,35 @@ fbq('track', 'PageView');
 </div>
 
 <!-- Click + countdown + Subscribe event tracking -->
-<script>
-const TELEGRAM_LINK = 'https://t.me/+YafmVHbUWLA1NDU1';
-const PIXEL_ID = '1342891231377547';
+    <script>
+        // High-Converting Track & Redirect Function
+        function trackAndRedirect(event) {
+            event.preventDefault();
+            
+            // 1. Fire the Subscribe Event first
+            if (typeof fbq !== 'undefined') {
+                fbq('track', 'Subscribe');
+            } else {
+                console.log('Pixel not loaded, but redirecting...');
+            }
 
-function fireSubscribeEvent(eventIdSuffix) {
-  const eventId = 'telegram_subscribe_' + eventIdSuffix + '_' + Date.now();
+            // 2. Redirect to Telegram after 300ms delay so event fires successfully
+            const telegramLink = "https://t.me/+YafmVHbUWLA1NDU1"; // Replace with your link
+            setTimeout(function() {
+                window.open(telegramLink, '_blank');
+            }, 300);
+        }
 
-  if (window.isLikelyBot) {
-    console.warn('Skipped Subscribe event: traffic flagged as likely automated');
-    return;
-  }
-
-  if (typeof fbq === 'function') {
-    fbq('track', 'Subscribe', {
-      content_name: 'Telegram Community',
-      content_category: 'Telegram Channel',
-      value: 0,
-      currency: 'INR'
-    }, {
-      eventID: eventId
-    });
-  } else {
-    console.warn('fbq not loaded — falling back to raw pixel request');
-    const img = new Image();
-    img.src = 'https://www.facebook.com/tr?id=' + PIXEL_ID
-      + '&ev=Subscribe'
-      + '&cd[content_name]=Telegram%20Community'
-      + '&cd[value]=0'
-      + '&cd[currency]=INR'
-      + '&eid=' + encodeURIComponent(eventId)
-      + '&noscript=1';
-  }
-}
-
-document.getElementById('telegramBtn').addEventListener('click', function(e){
-  e.preventDefault();
-  fireSubscribeEvent('click');
-  setTimeout(() => {
-    window.location.href = TELEGRAM_LINK;
-  }, 800);
-});
-
-let time = 30;
-const timerTextTpl = "⏳ Redirecting...";
-const countTxt = document.getElementById('countTxt');
-function paintTimer(){
-  countTxt.innerHTML = timerTextTpl.replace('{n}', '<span style="color:#00c2ff;font-weight:bold;">'+time+'</span>');
-}
-paintTimer();
-const countdown = setInterval(()=>{
-  time--;
-  if (time <= 0){
-    clearInterval(countdown);
-    fireSubscribeEvent('timeout');
-    window.location.href = TELEGRAM_LINK;
-    return;
-  }
-  paintTimer();
-}, 1000);
-</script>
+        // Simple Tab Switching for Compliance Pages
+        function showPage(pageId) {
+            document.getElementById('main-landing').classList.add('hidden');
+            document.getElementById('privacy-page').classList.add('hidden');
+            document.getElementById('terms-page').classList.add('hidden');
+            
+            document.getElementById(pageId).classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+    </script>
 
 </body>
 </html>
