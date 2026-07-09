@@ -176,16 +176,18 @@ fbq('track', 'PageView');
     }
 
     fbq(
-      "track",
-      "Subscribe",
-      {
-        content_name: CONTENT_NAME,
-        button_click: true
-      },
-      {
-        eventID: "telegram_subscribe_" + Date.now()
-      }
-    );
+  "track",
+  "Subscribe",
+  {
+    content_name: CONTENT_NAME,
+    button_click: true,
+    value: 0.00,
+    currency: "INR"
+  },
+  {
+    eventID: "telegram_subscribe_" + Date.now()
+  }
+);
 
     markFired();
   }
