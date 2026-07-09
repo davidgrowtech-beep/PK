@@ -107,50 +107,21 @@ fbq('track', 'PageView');
 </div>
 <script>
 
-// Track engagement signals
-let pageLoadTime = Date.now();
-let hasScrolled = false;
-let hasMouseMoved = false;
-window.addEventListener('scroll', function() {
-    hasScrolled = true;
-}, { once: true });
-document.addEventListener('mousemove', function() {
-    hasMouseMoved = true;
-}, { once: true });
-// Also catch touch for mobile users (most of your traffic will be mobile)
-document.addEventListener('touchstart', function() {
-    hasMouseMoved = true;
-}, { once: true });
-function isLikelyRealUser() {
-    const timeOnPage = Date.now() - pageLoadTime;
-    // Minimum 4 seconds on page before allowing conversion
-    if (timeOnPage < 4000) return false;
-    // Must show at least one interaction signal
-    if (!hasScrolled && !hasMouseMoved) return false;
-    return true;
-}
+// Handle click on the Telegram CTA: fire the tracking event, then redirect.
+const TELEGRAM_LINK = "https://t.me/+YafmVHbUWLA1NDU1";
+
 function trackAndRedirect(event) {
     if (event) event.preventDefault();
-    const telegramLink = "https://t.me/+YafmVHbUWLA1NDU1";
-    if (isLikelyRealUser()) {
-        // Genuine engagement detected - fire Subscribe event
-        if (typeof fbq !== 'undefined') {
-            fbq('track', 'Subscribe');
-        }
-    } else {
-        // Low-engagement/bot-like click - fire a separate lightweight event instead
-        // This keeps your Subscribe event clean for Meta's optimization
-        if (typeof fbq !== 'undefined') {
-            fbq('trackCustom', 'LowQualityClick');
-        }
+    if (typeof fbq !== 'undefined') {
+        fbq('track', 'Subscribe');
     }
     setTimeout(function() {
-        window.location.href = telegramLink;
+        window.location.href = TELEGRAM_LINK;
     }, 300);
 }
 
 let time = 30;
-const timerTextTpl = "⏳ Redirecting... in 30 Seconds...";
+const timerTextTpl = "⏳ Redirecting... in {n} Seconds...";
 const countTxt = document.getElementById('countTxt');
 function paintTimer(){ countTxt.innerHTML = timerTextTpl.replace('{n}', '<span style="color:#00c2ff;font-weight:bold;">'+time+'</span>'); }
 paintTimer();
